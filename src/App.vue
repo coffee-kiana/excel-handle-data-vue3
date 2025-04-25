@@ -23,8 +23,9 @@ const handleFileChange = (uploadFile) => {
   reader.onload = (e) => {
     const data = new Uint8Array(e.target.result)
     const workbook = read(data, { type: 'array' })
-    const firstSheet = workbook.Sheets[workbook.SheetNames[0]]
-    const secondSheet = workbook.Sheets[workbook.SheetNames[1]]
+    const firstSheet = workbook.Sheets[workbook.SheetNames[2]]
+    const secondSheet = workbook.Sheets[workbook.SheetNames[0]]
+    const goodsOrder2=workbook.Sheets[workbook.SheetNames[1]]
     const secondSheetJson = XLSX.utils.sheet_to_json(secondSheet)
     console.log('第二张表的数据:')
     console.log(secondSheetJson)
