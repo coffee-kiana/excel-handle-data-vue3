@@ -1,10 +1,12 @@
 @import './base.css';
 
 #app {
-  max-width: 1280px;
+  /* max-width: 1280px; */
+  width: 100vw;
   margin: 0 auto;
-  padding: 2rem;
+  /* padding: 2rem; */
   font-weight: normal;
+  box-sizing: border-box;
 }
 
 a,
@@ -24,11 +26,12 @@ a,
 @media (min-width: 1024px) {
   body {
     display: flex;
-    place-items: center;
+    /* place-items:; */
   }
 
   #app {
-    display: grid;
+    /* display: grid; */
+    display: flex;
     grid-template-columns: 1fr 1fr;
     padding: 0 2rem;
   }

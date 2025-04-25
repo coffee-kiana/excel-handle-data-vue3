@@ -16,6 +16,8 @@ const excelData = ref([])
 const newList2 = [];
 const goodsObject = {};
 const tableData = ref([]);
+const secondSheetNewList = [];
+const secondTableData = ref([]);
 const handleFileChange = (uploadFile) => {
   const reader = new FileReader()
   reader.onload = (e) => {
@@ -26,6 +28,47 @@ const handleFileChange = (uploadFile) => {
     const secondSheetJson = XLSX.utils.sheet_to_json(secondSheet)
     console.log('第二张表的数据:')
     console.log(secondSheetJson)
+    const secondSheetList=secondSheetJson.map(obj => {
+      const newObj = {};
+      for (const key in obj) {
+        if (obj.hasOwnProperty(key)) {
+          // 移除属性名中的空格
+          const newKey = key.replace(/\s+/g, '');
+          newObj[newKey] = obj[key];
+        }
+      }
+      return newObj;
+    });
+    console.log(secondSheetList)
+
+    secondSheetList.forEach((item,index) => {
+      for(const key in item){
+        if(key.includes('Size')){
+          secondSheetNewList.push({
+            color:item.Color,
+            name:item.Name,
+            styleNumber:item.StyleNumber,
+            price:item['M.S.R.P.(USD)'],
+            sizeName:item[key].replace(/\s+/g, ''),
+            qty:item[`${key.replace('Size','Qty')}`]||0,
+            tableRow:index+1
+          })
+          
+        }
+      }
+    })
+    console.log(secondSheetNewList)
+    secondTableData.value=secondSheetNewList.sort((a,b)=>{
+            // 先按 name 排序
+        if (a.name < b.name) return -1;
+        if (a.name > b.name) return 1;
+
+        // 如果 name 相同，则按 color 排序
+        if (a.color < b.color) return -1;
+        if (a.color > b.color) return 1;
+    }).filter((item)=>item.qty>0)
+
+
     const json = XLSX.utils.sheet_to_json(firstSheet)
     excelData.value = json
     console.log('解析后的数据:', excelData.value)
@@ -106,14 +149,10 @@ const handleFileChange = (uploadFile) => {
     <template #trigger>
       <el-button type="primary">select file</el-button>
     </template>
-    <template #tip>
-      <div class="el-upload__tip text-red">
-        limit 1 file, new file will cover the old file
-      </div>
-    </template>
   </el-upload>
 
   <div style="margin-top: 20px;">
+  <h3>客户订单按商品统计</h3>
     <el-table :data="tableData" border style="width: 100%">
     <el-table-column prop="composeName" label="商品名称" width="200" />
     <el-table-column prop="count" label="下单总数" width="100" />
@@ -131,6 +170,17 @@ const handleFileChange = (uploadFile) => {
     </el-table-column>
   </el-table>
   </div>
+
+  <div style="margin-top: 20px;">
+  <h3>订货单按size统计</h3>
+    <el-table :data="secondTableData" border style="width: 100%">
+    <el-table-column prop="name" label="商品名称" width="200" />
+    <el-table-column prop="qty" label="订货数量" width="200" />
+    <el-table-column prop="color" label="颜色规格" width="100" />
+    <el-table-column prop="sizeName" label="尺码规格" />
+    <el-table-column prop="tableRow" label="对应订货单的行" />
+  </el-table>
+  </div>
 </div>
 </template>
 
@@ -138,5 +188,6 @@ const handleFileChange = (uploadFile) => {
 .wrapper{
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 </style>
